@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"testing"
 )
@@ -45,9 +44,7 @@ func TestStore(t *testing.T) {
 		}
 
 		b, _ := ioutil.ReadAll(r)
-		if rc, ok := r.(io.ReadCloser); ok {
-			rc.Close()
-		}
+		r.Close()
 		if string(b) != string(data) {
 			t.Errorf("want %s have %s", data, b)
 		}

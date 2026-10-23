@@ -1,7 +1,9 @@
 package p2p
 
 import (
+	"encoding/binary"
 	"encoding/gob"
+	"fmt"
 	"io"
 )
 
@@ -15,29 +17,43 @@ func (dec GOBDecoder) Decode(r io.Reader, msg *RPC) error {
 	return gob.NewDecoder(r).Decode(msg)
 }
 
+// DefaultDecoder reads one length-prefixed frame (see message.go).
 type DefaultDecoder struct{}
 
 func (dec DefaultDecoder) Decode(r io.Reader, msg *RPC) error {
-	peekBuf := make([]byte, 1)
-	if _, err := r.Read(peekBuf); err != nil {
-		return nil
-	}
-
-	// In case of a stream we are not decoding what is being sent over the network.
-	// We are just setting Stream true so we can handle that in our logic.
-	stream := peekBuf[0] == IncomingStream
-	if stream {
-		msg.Stream = true
-		return nil
-	}
-
-	buf := make([]byte, 1028)
-	n, err := r.Read(buf)
-	if err != nil {
+	tag := make([]byte, 1)
+	if _, err := io.ReadFull(r, tag); err != nil {
 		return err
 	}
 
-	msg.Payload = buf[:n]
+	switch tag[0] {
+	case IncomingStream:
+		// We do not read the stream itself here, only its length. The
+		// consumer reads the bytes directly from the peer.
+		var size int64
+		if err := binary.Read(r, binary.LittleEndian, &size); err != nil {
+			return err
+		}
+		if size < 0 {
+			return fmt.Errorf("invalid stream size %d", size)
+		}
+		msg.Stream = true
+		msg.StreamSize = size
+		return nil
 
-	return nil
+	case IncomingMessage:
+		var size uint32
+		if err := binary.Read(r, binary.LittleEndian, &size); err != nil {
+			return err
+		}
+		if size > MaxMessageSize {
+			return fmt.Errorf("message of %d bytes exceeds limit of %d", size, MaxMessageSize)
+		}
+		msg.Payload = make([]byte, size)
+		_, err := io.ReadFull(r, msg.Payload)
+		return err
+
+	default:
+		return fmt.Errorf("unknown frame type 0x%x", tag[0])
+	}
 }

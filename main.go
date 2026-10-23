@@ -51,7 +51,9 @@ func main() {
 	for i := 0; i < 20; i++ {
 		key := fmt.Sprintf("picture_%d.png", i)
 		data := bytes.NewReader([]byte("my big data file here!"))
-		s3.Store(key, data)
+		if err := s3.Store(key, data); err != nil {
+			log.Fatal(err)
+		}
 
 		if err := s3.store.Delete(s3.ID, key); err != nil {
 			log.Fatal(err)
@@ -63,6 +65,7 @@ func main() {
 		}
 
 		b, err := ioutil.ReadAll(r)
+		r.Close()
 		if err != nil {
 			log.Fatal(err)
 		}
