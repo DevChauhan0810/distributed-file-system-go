@@ -96,6 +96,31 @@ The demo in `main.go` does the following:
 4. Deletes each file from node `:5000`'s local disk.
 5. Calls `Get` for each file. Since the local copy is gone, node `:5000` fetches it back from the network and prints its contents.
 
+Each of the 20 rounds runs the full cycle:
+
+> **store → replicate to peers (encrypted) → lose the local copy → recover it from the network → data comes back unchanged**
+
+The peers only ever hold encrypted copies and can't read them, because only node `:5000` has the key. The stored copies are 38 bytes: the 22-byte message plus a 16-byte IV, which is a random value needed to decrypt it.
+
+#### What you'll see
+
+One round of output (`picture_0.png`), shortened:
+
+```
+[:5000] received and written (38) bytes to disk          # stored locally + sent to peers
+[:7000] written 38 bytes to disk                          # peer saves encrypted copy
+[:3000] written 38 bytes to disk                          # peer saves encrypted copy
+deleted [d44bbd0bbda685d5db90f419568b531ab9afa97b] from disk   # local copy removed
+[:5000] dont have file (picture_0.png) locally, fetching from network...
+[:3000] serving file (44b2a6b69cffe1ea7922da80d75577e7) over the network
+[:7000] serving file (44b2a6b69cffe1ea7922da80d75577e7) over the network
+[:5000] received (38) bytes over the network from (127.0.0.1:7000)
+[:5000] received (38) bytes over the network from (127.0.0.1:3000)
+my big data file here!                                    # decrypted and intact
+```
+
+If `my big data file here!` is printed 20 times, everything worked.
+
 ### Run the tests
 
 ```bash
