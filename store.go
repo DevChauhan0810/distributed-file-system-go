@@ -114,6 +114,7 @@ func (s *Store) WriteDecrypt(encKey []byte, id string, key string, r io.Reader) 
 	if err != nil {
 		return 0, err
 	}
+	defer f.Close()
 	n, err := copyDecrypt(encKey, r, f)
 	return int64(n), err
 }
@@ -135,6 +136,7 @@ func (s *Store) writeStream(id string, key string, r io.Reader) (int64, error) {
 	if err != nil {
 		return 0, err
 	}
+	defer f.Close()
 	return io.Copy(f, r)
 }
 

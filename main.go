@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/anthdm/foreverstore/p2p"
@@ -20,7 +21,7 @@ func makeServer(listenAddr string, nodes ...string) *FileServer {
 
 	fileServerOpts := FileServerOpts{
 		EncKey:            newEncryptionKey(),
-		StorageRoot:       listenAddr + "_network",
+		StorageRoot:       strings.ReplaceAll(listenAddr, ":", "") + "_network",
 		PathTransformFunc: CASPathTransformFunc,
 		Transport:         tcpTransport,
 		BootstrapNodes:    nodes,
