@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/anthdm/foreverstore/p2p"
+	"github.com/DevChauhan0810/distributed-file-system-go/p2p"
 )
 
 // peerResponseTimeout is how long Get waits for a peer to answer a request

@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/anthdm/foreverstore/p2p"
+	"github.com/DevChauhan0810/distributed-file-system-go/p2p"
 )
 
 func newTestServer(t *testing.T, listenAddr string, nodes ...string) *FileServer {

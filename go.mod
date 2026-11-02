@@ -1,4 +1,4 @@
-module github.com/anthdm/foreverstore
+module github.com/DevChauhan0810/distributed-file-system-go
 
 go 1.18
 
