@@ -48,7 +48,7 @@ func main() {
 	go s3.Start()
 	time.Sleep(2 * time.Second)
 
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 3; i++ {
 		key := fmt.Sprintf("picture_%d.png", i)
 		data := bytes.NewReader([]byte("my big data file here!"))
 		if err := s3.Store(key, data); err != nil {

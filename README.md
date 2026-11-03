@@ -107,11 +107,11 @@ The demo in `main.go` does the following:
 
 1. Starts two nodes on `:3000` and `:7000`.
 2. Starts a third node on `:5000`, which connects to the other two.
-3. Stores 20 files from node `:5000`, so they are copied to both peers.
+3. Stores 3 files from node `:5000`, so they are copied to both peers.
 4. Deletes each file from node `:5000`'s local disk.
 5. Calls `Get` for each file. Since the local copy is gone, node `:5000` fetches it back from one of its peers and prints its contents.
 
-Each of the 20 rounds runs the full cycle:
+Each of the 3 rounds runs the full cycle:
 
 > **store → replicate to peers (encrypted) → lose the local copy → recover it from the network → data comes back unchanged**
 
@@ -132,7 +132,7 @@ One round of output (`picture_0.png`):
 my big data file here!                                 # verified, decrypted and intact
 ```
 
-Only one peer serves each file. If `my big data file here!` is printed 20 times, everything worked.
+Only one peer serves each file. If `my big data file here!` is printed 3 times, everything worked.
 
 ### Run the tests
 
